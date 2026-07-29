@@ -2,118 +2,365 @@
 <html>
 <head>
     <title>Perfume Explorer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Georgia', 'Times New Roman', serif; background: #FDF6EC; color: #3B2F2F; padding: 20px; }
-        h1 { text-align: center; margin-bottom: 6px; font-size: 2.2em; color: #B8860B; letter-spacing: 2px; }
-        .search-bar { display: flex; justify-content: center; margin-bottom: 20px; }
-        .search-bar input[type=text] { width: 420px; padding: 12px 16px; border-radius: 8px; border: 1px solid #D4B896;
-            background: #FFFDF7; color: #3B2F2F; font-size: 16px; font-family: inherit; }
-        .search-bar input[type=text]::placeholder { color: #B8A88A; }
-        .filters { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 24px; }
-        .filters select, .filters input { padding: 8px 12px; border-radius: 6px; border: 1px solid #D4B896;
-            background: #FFFDF7; color: #5C4B3A; font-size: 14px; font-family: inherit; }
-        .filters button { padding: 8px 24px; border-radius: 6px; border: none;
-            background: linear-gradient(135deg, #C9A84C, #B8860B); color: #FFF; font-weight: bold; cursor: pointer;
-            font-family: inherit; letter-spacing: 1px; text-transform: uppercase; font-size: 13px; }
-        .filters button:hover { background: linear-gradient(135deg, #B8860B, #996515); }
-        .stats { display: flex; gap: 24px; justify-content: center; margin-bottom: 24px; }
-        .stat { background: #FFFDF7; padding: 16px 24px; border-radius: 10px; text-align: center;
-            border: 1px solid #E8D5B5; box-shadow: 0 2px 8px rgba(184,134,11,0.08); }
-        .stat .num { font-size: 1.8em; font-weight: bold; color: #B8860B; }
-        .stat .label { font-size: 0.85em; color: #8B7355; margin-top: 4px; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; }
-        .card { background: #FFFDF7; border-radius: 12px; padding: 20px; border: 1px solid #E8D5B5;
-            box-shadow: 0 2px 12px rgba(184,134,11,0.06); transition: box-shadow 0.2s; }
-        .card:hover { box-shadow: 0 4px 20px rgba(184,134,11,0.15); }
-        .card h3 { color: #B8860B; margin-bottom: 4px; font-size: 1.15em; }
-        .card .brand { color: #8B7355; margin-bottom: 12px; font-style: italic; }
-        .card .meta { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
-        .tag { background: #F5EDDF; padding: 3px 10px; border-radius: 12px; font-size: 0.8em; color: #7A6745;
-            border: 1px solid #E8D5B5; }
-        .notes { font-size: 0.85em; color: #8B7355; margin-top: 8px; line-height: 1.6; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #FDF6EC 0%, #F5E6CC 30%, #FDF6EC 50%, #F0DCBF 70%, #FDF6EC 100%);
+            background-size: 400% 400%;
+            animation: shimmer 8s ease infinite;
+            color: #3B2F2F;
+            min-height: 100vh;
+        }
+        @keyframes shimmer {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* --- Header --- */
+        .header {
+            text-align: center;
+            padding: 40px 20px 30px;
+        }
+        .header h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.8em;
+            color: #B8860B;
+            letter-spacing: 3px;
+            text-shadow: 0 1px 2px rgba(184,134,11,0.2);
+        }
+        .header p {
+            color: #A89070;
+            font-size: 0.95em;
+            margin-top: 6px;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            font-weight: 300;
+        }
+
+        /* --- Layout --- */
+        .main-layout {
+            display: flex;
+            max-width: 1400px;
+            margin: 0 auto;
+            gap: 24px;
+            padding: 0 20px 40px;
+        }
+        .content-area { flex: 1; }
+
+        /* --- Sidebar filters --- */
+        .sidebar {
+            width: 260px;
+            flex-shrink: 0;
+            position: sticky;
+            top: 20px;
+            align-self: flex-start;
+        }
+        .filter-panel {
+            background: rgba(255,253,247,0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid #E8D5B5;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 4px 24px rgba(184,134,11,0.08);
+        }
+        .filter-panel h3 {
+            font-family: 'Playfair Display', serif;
+            color: #B8860B;
+            font-size: 1.1em;
+            margin-bottom: 18px;
+            letter-spacing: 1px;
+        }
+        .filter-group { margin-bottom: 16px; }
+        .filter-group label {
+            display: block;
+            font-size: 0.75em;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: #8B7355;
+            margin-bottom: 6px;
+            font-weight: 500;
+        }
+        .filter-group select,
+        .filter-group input {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: 1px solid #D4B896;
+            background: #FFFDF7;
+            color: #5C4B3A;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            transition: border-color 0.2s;
+        }
+        .filter-group select:focus,
+        .filter-group input:focus {
+            outline: none;
+            border-color: #B8860B;
+        }
+        .filter-btn {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: none;
+            background: linear-gradient(135deg, #C9A84C, #B8860B);
+            color: #FFF;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-size: 12px;
+            margin-top: 8px;
+            transition: transform 0.15s, box-shadow 0.15s;
+        }
+        .filter-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(184,134,11,0.3);
+        }
+
+        /* --- Search bar --- */
+        .search-container {
+            margin-bottom: 24px;
+        }
+        .search-wrap {
+            position: relative;
+            max-width: 100%;
+        }
+        .search-wrap input {
+            width: 100%;
+            padding: 16px 20px 16px 48px;
+            border-radius: 14px;
+            border: 1px solid #D4B896;
+            background: rgba(255,253,247,0.85);
+            backdrop-filter: blur(12px);
+            color: #3B2F2F;
+            font-size: 16px;
+            font-family: 'Inter', sans-serif;
+            box-shadow: 0 4px 16px rgba(184,134,11,0.06);
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .search-wrap input:focus {
+            outline: none;
+            border-color: #B8860B;
+            box-shadow: 0 4px 24px rgba(184,134,11,0.12);
+        }
+        .search-wrap input::placeholder { color: #B8A88A; }
+        .search-icon {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 18px;
+            color: #C9A84C;
+        }
+
+        /* --- Stats --- */
+        .stats { display: flex; gap: 16px; margin-bottom: 24px; }
+        .stat {
+            flex: 1;
+            background: rgba(255,253,247,0.85);
+            backdrop-filter: blur(12px);
+            padding: 16px;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid #E8D5B5;
+            box-shadow: 0 2px 8px rgba(184,134,11,0.06);
+        }
+        .stat .num {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.6em;
+            font-weight: 700;
+            color: #B8860B;
+        }
+        .stat .label { font-size: 0.75em; color: #8B7355; margin-top: 2px; text-transform: uppercase; letter-spacing: 1px; }
+
+        /* --- Cards --- */
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+        .card {
+            background: rgba(255,253,247,0.9);
+            backdrop-filter: blur(12px);
+            border-radius: 14px;
+            padding: 22px;
+            border: 1px solid #E8D5B5;
+            box-shadow: 0 2px 12px rgba(184,134,11,0.05);
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+            cursor: default;
+        }
+        .card:hover {
+            transform: scale(1.04);
+            box-shadow: 0 12px 40px rgba(184,134,11,0.18);
+            z-index: 2;
+            position: relative;
+        }
+        .card h3 {
+            font-family: 'Playfair Display', serif;
+            color: #B8860B;
+            margin-bottom: 2px;
+            font-size: 1.15em;
+        }
+        .card .brand { color: #8B7355; margin-bottom: 12px; font-style: italic; font-size: 0.9em; }
+        .card .meta { display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap; }
+        .tag {
+            background: linear-gradient(135deg, #F5EDDF, #EDE0CA);
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.75em;
+            color: #7A6745;
+            border: 1px solid #E0D0B5;
+        }
+        .notes { font-size: 0.83em; color: #8B7355; margin-top: 10px; line-height: 1.7; }
         .notes span { color: #5C4B3A; }
-        .price-rating { display: flex; justify-content: space-between; margin-top: 14px;
-            padding-top: 12px; border-top: 1px solid #E8D5B5; }
-        .price { font-size: 1.3em; font-weight: bold; color: #3B2F2F; }
-        .rating { color: #C9A84C; font-size: 1.1em; }
-        .empty { text-align: center; color: #B8A88A; padding: 60px; font-size: 1.2em; }
-        .powered { text-align: center; color: #C9B88C; margin-top: 30px; font-size: 0.8em; letter-spacing: 1px; }
+        .notes-row { margin-bottom: 2px; }
+
+        /* --- Hidden notes on hover expand --- */
+        .notes-detail { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; }
+        .card:hover .notes-detail { max-height: 120px; }
+
+        .price-rating {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 14px;
+            padding-top: 12px;
+            border-top: 1px solid #E8D5B5;
+        }
+        .price { font-size: 1.3em; font-weight: 600; color: #3B2F2F; }
+        .rating { color: #C9A84C; font-size: 1.05em; font-weight: 500; }
+        .longevity { font-size: 0.8em; color: #A89070; }
+
+        .empty { text-align: center; color: #B8A88A; padding: 80px 20px; font-size: 1.1em; }
+        .powered {
+            text-align: center;
+            color: #C9B88C;
+            margin-top: 40px;
+            padding-bottom: 20px;
+            font-size: 0.8em;
+            letter-spacing: 2px;
+        }
+
+        @media (max-width: 768px) {
+            .main-layout { flex-direction: column-reverse; }
+            .sidebar { width: 100%; position: static; }
+            .header h1 { font-size: 2em; }
+        }
     </style>
 </head>
 <body>
-    <h1>Perfume Explorer</h1>
+
+    <div class="header">
+        <h1>Perfume Explorer</h1>
+        <p>Discover your signature scent</p>
+    </div>
 
     <form action="/search" method="get">
-        <div class="search-bar">
-            <input type="text" name="q" placeholder="Search by name, brand, or notes..."
-                   value="{{ filters.get('q', '') }}">
-        </div>
-        <div class="filters">
-            <select name="brand">
-                <option value="">All Brands</option>
-                {% for b in brands %}
-                <option value="{{ b }}" {{ 'selected' if filters.get('brand') == b }}>{{ b }}</option>
+    <div class="main-layout">
+
+        <!-- Left: content -->
+        <div class="content-area">
+
+            <div class="search-container">
+                <div class="search-wrap">
+                    <span class="search-icon">&#9906;</span>
+                    <input type="text" name="q" placeholder="Search by name, brand, or notes..."
+                           value="{{ filters.get('q', '') }}">
+                </div>
+            </div>
+
+            {% if stats %}
+            <div class="stats">
+                <div class="stat"><div class="num">{{ stats.count }}</div><div class="label">Perfumes</div></div>
+                <div class="stat"><div class="num">${{ stats.avg_price|int }}</div><div class="label">Avg Price</div></div>
+                <div class="stat"><div class="num">{{ stats.avg_rating }}</div><div class="label">Rating</div></div>
+                <div class="stat"><div class="num">{{ stats.avg_longevity|int }}h</div><div class="label">Longevity</div></div>
+            </div>
+            {% endif %}
+
+            {% if perfumes %}
+            <div class="grid">
+                {% for p in perfumes %}
+                <div class="card">
+                    <h3>{{ p.name }}</h3>
+                    <div class="brand">{{ p.brand }}</div>
+                    <div class="meta">
+                        <span class="tag">{{ p.category }}</span>
+                        <span class="tag">{{ p.gender }}</span>
+                        <span class="tag">{{ p.season }}</span>
+                        <span class="tag">{{ p.year }}</span>
+                    </div>
+                    <div class="notes">
+                        <div class="notes-row">Top: <span>{{ p.top }}</span></div>
+                    </div>
+                    <div class="notes-detail">
+                        <div class="notes">
+                            <div class="notes-row">Heart: <span>{{ p.heart }}</span></div>
+                            <div class="notes-row">Base: <span>{{ p.base }}</span></div>
+                        </div>
+                    </div>
+                    <div class="price-rating">
+                        <div class="price">${{ p.price|int }}</div>
+                        <div>
+                            <div class="rating">{{ p.rating }} &#9733;</div>
+                            <div class="longevity">{{ p.longevity }}h wear</div>
+                        </div>
+                    </div>
+                </div>
                 {% endfor %}
-            </select>
-            <select name="gender">
-                <option value="">All Genders</option>
-                <option value="men" {{ 'selected' if filters.get('gender') == 'men' }}>Men</option>
-                <option value="women" {{ 'selected' if filters.get('gender') == 'women' }}>Women</option>
-                <option value="unisex" {{ 'selected' if filters.get('gender') == 'unisex' }}>Unisex</option>
-            </select>
-            <select name="season">
-                <option value="">All Seasons</option>
-                {% for s in seasons %}
-                <option value="{{ s }}" {{ 'selected' if filters.get('season') == s }}>{{ s }}</option>
-                {% endfor %}
-            </select>
-            <input type="number" name="min_rating" placeholder="Min rating" step="0.1" min="0" max="5"
-                   value="{{ filters.get('min_rating', 0) }}" style="width:100px;">
-            <button type="submit">Search</button>
+            </div>
+            {% elif filters %}
+            <div class="empty">No perfumes match your filters.</div>
+            {% else %}
+            <div class="empty">Search or filter to explore perfumes.</div>
+            {% endif %}
+
         </div>
+
+        <!-- Right: filters sidebar -->
+        <div class="sidebar">
+            <div class="filter-panel">
+                <h3>Refine</h3>
+                <div class="filter-group">
+                    <label>Brand</label>
+                    <select name="brand">
+                        <option value="">All Brands</option>
+                        {% for b in brands %}
+                        <option value="{{ b }}" {{ 'selected' if filters.get('brand') == b }}>{{ b }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Gender</label>
+                    <select name="gender">
+                        <option value="">All</option>
+                        <option value="men" {{ 'selected' if filters.get('gender') == 'men' }}>Men</option>
+                        <option value="women" {{ 'selected' if filters.get('gender') == 'women' }}>Women</option>
+                        <option value="unisex" {{ 'selected' if filters.get('gender') == 'unisex' }}>Unisex</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Season</label>
+                    <select name="season">
+                        <option value="">All Seasons</option>
+                        {% for s in seasons %}
+                        <option value="{{ s }}" {{ 'selected' if filters.get('season') == s }}>{{ s }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Min Rating</label>
+                    <input type="number" name="min_rating" step="0.1" min="0" max="5"
+                           value="{{ filters.get('min_rating', 0) }}">
+                </div>
+                <button type="submit" class="filter-btn">Search</button>
+            </div>
+        </div>
+
+    </div>
     </form>
 
-    {% if stats %}
-    <div class="stats">
-        <div class="stat"><div class="num">{{ stats.count }}</div><div class="label">Perfumes</div></div>
-        <div class="stat"><div class="num">${{ stats.avg_price|int }}</div><div class="label">Avg Price</div></div>
-        <div class="stat"><div class="num">{{ stats.avg_rating }} ⭐</div><div class="label">Avg Rating</div></div>
-        <div class="stat"><div class="num">{{ stats.avg_longevity|int }}h</div><div class="label">Avg Longevity</div></div>
-    </div>
-    {% endif %}
+    <div class="powered">Powered by ClickHouse Cloud</div>
 
-    {% if perfumes %}
-    <div class="grid">
-        {% for p in perfumes %}
-        <div class="card">
-            <h3>{{ p.name }}</h3>
-            <div class="brand">{{ p.brand }}</div>
-            <div class="meta">
-                <span class="tag">{{ p.category }}</span>
-                <span class="tag">{{ p.gender }}</span>
-                <span class="tag">{{ p.season }}</span>
-                <span class="tag">{{ p.year }}</span>
-                <span class="tag">{{ p.longevity }}h</span>
-            </div>
-            <div class="notes">
-                <div> Top: <span>{{ p.top }}</span></div>
-                <div> Heart: <span>{{ p.heart }}</span></div>
-                <div> Base: <span>{{ p.base }}</span></div>
-            </div>
-            <div class="price-rating">
-                <div class="price">${{ p.price|int }}</div>
-                <div class="rating">{{ p.rating }} ⭐</div>
-            </div>
-        </div>
-        {% endfor %}
-    </div>
-    {% elif filters %}
-    <div class="empty">No perfumes match your filters.</div>
-    {% else %}
-    <div class="empty">Search or filter to explore perfumes.</div>
-    {% endif %}
-
-    <div class="powered">Powered by ClickHouse Cloud ⚡</div>
 </body>
 </html>
