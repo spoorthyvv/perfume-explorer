@@ -4,33 +4,41 @@
     <title>Perfume Explorer</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: -apple-system, sans-serif; background: #0f0f0f; color: #e0e0e0; padding: 20px; }
-        h1 { text-align: center; margin-bottom: 20px; font-size: 2em; }
+        body { font-family: 'Georgia', 'Times New Roman', serif; background: #FDF6EC; color: #3B2F2F; padding: 20px; }
+        h1 { text-align: center; margin-bottom: 6px; font-size: 2.2em; color: #B8860B; letter-spacing: 2px; }
         .search-bar { display: flex; justify-content: center; margin-bottom: 20px; }
-        .search-bar input[type=text] { width: 400px; padding: 12px 16px; border-radius: 8px; border: 1px solid #333;
-            background: #1a1a1a; color: #fff; font-size: 16px; }
+        .search-bar input[type=text] { width: 420px; padding: 12px 16px; border-radius: 8px; border: 1px solid #D4B896;
+            background: #FFFDF7; color: #3B2F2F; font-size: 16px; font-family: inherit; }
+        .search-bar input[type=text]::placeholder { color: #B8A88A; }
         .filters { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 24px; }
-        .filters select, .filters input { padding: 8px 12px; border-radius: 6px; border: 1px solid #333;
-            background: #1a1a1a; color: #ccc; font-size: 14px; }
-        .filters button { padding: 8px 20px; border-radius: 6px; border: none;
-            background: #f5c518; color: #000; font-weight: bold; cursor: pointer; }
+        .filters select, .filters input { padding: 8px 12px; border-radius: 6px; border: 1px solid #D4B896;
+            background: #FFFDF7; color: #5C4B3A; font-size: 14px; font-family: inherit; }
+        .filters button { padding: 8px 24px; border-radius: 6px; border: none;
+            background: linear-gradient(135deg, #C9A84C, #B8860B); color: #FFF; font-weight: bold; cursor: pointer;
+            font-family: inherit; letter-spacing: 1px; text-transform: uppercase; font-size: 13px; }
+        .filters button:hover { background: linear-gradient(135deg, #B8860B, #996515); }
         .stats { display: flex; gap: 24px; justify-content: center; margin-bottom: 24px; }
-        .stat { background: #1a1a1a; padding: 16px 24px; border-radius: 8px; text-align: center; }
-        .stat .num { font-size: 1.8em; font-weight: bold; color: #f5c518; }
-        .stat .label { font-size: 0.85em; color: #888; margin-top: 4px; }
+        .stat { background: #FFFDF7; padding: 16px 24px; border-radius: 10px; text-align: center;
+            border: 1px solid #E8D5B5; box-shadow: 0 2px 8px rgba(184,134,11,0.08); }
+        .stat .num { font-size: 1.8em; font-weight: bold; color: #B8860B; }
+        .stat .label { font-size: 0.85em; color: #8B7355; margin-top: 4px; }
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; }
-        .card { background: #1a1a1a; border-radius: 10px; padding: 20px; border: 1px solid #222; }
-        .card h3 { color: #f5c518; margin-bottom: 4px; }
-        .card .brand { color: #888; margin-bottom: 12px; }
-        .card .meta { display: flex; gap: 12px; margin-bottom: 12px; flex-wrap: wrap; }
-        .tag { background: #2a2a2a; padding: 3px 10px; border-radius: 12px; font-size: 0.8em; color: #aaa; }
-        .notes { font-size: 0.85em; color: #777; margin-top: 8px; line-height: 1.5; }
-        .notes span { color: #bbb; }
-        .price-rating { display: flex; justify-content: space-between; margin-top: 12px; }
-        .price { font-size: 1.3em; font-weight: bold; }
-        .rating { color: #f5c518; font-size: 1.1em; }
-        .empty { text-align: center; color: #555; padding: 60px; font-size: 1.2em; }
-        .powered { text-align: center; color: #333; margin-top: 30px; font-size: 0.8em; }
+        .card { background: #FFFDF7; border-radius: 12px; padding: 20px; border: 1px solid #E8D5B5;
+            box-shadow: 0 2px 12px rgba(184,134,11,0.06); transition: box-shadow 0.2s; }
+        .card:hover { box-shadow: 0 4px 20px rgba(184,134,11,0.15); }
+        .card h3 { color: #B8860B; margin-bottom: 4px; font-size: 1.15em; }
+        .card .brand { color: #8B7355; margin-bottom: 12px; font-style: italic; }
+        .card .meta { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+        .tag { background: #F5EDDF; padding: 3px 10px; border-radius: 12px; font-size: 0.8em; color: #7A6745;
+            border: 1px solid #E8D5B5; }
+        .notes { font-size: 0.85em; color: #8B7355; margin-top: 8px; line-height: 1.6; }
+        .notes span { color: #5C4B3A; }
+        .price-rating { display: flex; justify-content: space-between; margin-top: 14px;
+            padding-top: 12px; border-top: 1px solid #E8D5B5; }
+        .price { font-size: 1.3em; font-weight: bold; color: #3B2F2F; }
+        .rating { color: #C9A84C; font-size: 1.1em; }
+        .empty { text-align: center; color: #B8A88A; padding: 60px; font-size: 1.2em; }
+        .powered { text-align: center; color: #C9B88C; margin-top: 30px; font-size: 0.8em; letter-spacing: 1px; }
     </style>
 </head>
 <body>
