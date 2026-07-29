@@ -23,8 +23,8 @@ client = clickhouse_connect.get_client(
 def home(request: Request):
     brands = [r[0] for r in client.query("SELECT DISTINCT brand FROM perfume_db.catalog ORDER BY brand").result_rows]
     seasons = [r[0] for r in client.query("SELECT DISTINCT season FROM perfume_db.catalog ORDER BY season").result_rows]
-    return templates.TemplateResponse("index.html", {
-        "request": request, "brands": brands, "seasons": seasons,
+    return templates.TemplateResponse(request=request, name="index.html", context={
+        "brands": brands, "seasons": seasons,
         "perfumes": [], "stats": None, "filters": {}
     })
 
@@ -86,8 +86,8 @@ def search(
     brands = [r[0] for r in client.query("SELECT DISTINCT brand FROM perfume_db.catalog ORDER BY brand").result_rows]
     seasons_list = [r[0] for r in client.query("SELECT DISTINCT season FROM perfume_db.catalog ORDER BY season").result_rows]
 
-    return templates.TemplateResponse("index.html", {
-        "request": request, "brands": brands, "seasons": seasons_list,
+    return templates.TemplateResponse(request=request, name="index.html", context={
+        "brands": brands, "seasons": seasons_list,
         "perfumes": perfumes, "stats": stats,
         "filters": {"q": q, "brand": brand, "gender": gender, "season": season,
                      "min_price": min_price, "max_price": max_price, "min_rating": min_rating}
