@@ -18,11 +18,52 @@
             50% { background-position: 100% 50%; }
             100% { background-position: 0% 50%; }
         }
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background:
+                radial-gradient(ellipse at 20% 50%, rgba(201,168,76,0.12) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 20%, rgba(184,134,11,0.08) 0%, transparent 40%),
+                radial-gradient(ellipse at 60% 80%, rgba(201,168,76,0.10) 0%, transparent 45%);
+            background-size: 200% 200%;
+            animation: glowMove 6s ease-in-out infinite alternate;
+            pointer-events: none;
+            z-index: 0;
+        }
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-image:
+                radial-gradient(1px 1px at 10% 30%, rgba(201,168,76,0.4) 0%, transparent 100%),
+                radial-gradient(1px 1px at 30% 70%, rgba(184,134,11,0.3) 0%, transparent 100%),
+                radial-gradient(1px 1px at 50% 20%, rgba(201,168,76,0.35) 0%, transparent 100%),
+                radial-gradient(1px 1px at 70% 60%, rgba(184,134,11,0.3) 0%, transparent 100%),
+                radial-gradient(1px 1px at 90% 40%, rgba(201,168,76,0.4) 0%, transparent 100%),
+                radial-gradient(1px 1px at 25% 90%, rgba(184,134,11,0.25) 0%, transparent 100%),
+                radial-gradient(1px 1px at 85% 85%, rgba(201,168,76,0.35) 0%, transparent 100%);
+            animation: sparkle 4s ease-in-out infinite alternate;
+            pointer-events: none;
+            z-index: 0;
+        }
+        @keyframes glowMove {
+            0% { background-position: 0% 0%; }
+            100% { background-position: 100% 100%; }
+        }
+        @keyframes sparkle {
+            0% { opacity: 0.3; }
+            50% { opacity: 1; }
+            100% { opacity: 0.4; }
+        }
 
-        /* --- Header --- */
         .header {
             text-align: center;
             padding: 40px 20px 30px;
+            position: relative;
+            z-index: 1;
         }
         .header h1 {
             font-family: 'Playfair Display', serif;
@@ -40,17 +81,17 @@
             font-weight: 300;
         }
 
-        /* --- Layout --- */
         .main-layout {
             display: flex;
             max-width: 1400px;
             margin: 0 auto;
             gap: 24px;
             padding: 0 20px 40px;
+            position: relative;
+            z-index: 1;
         }
         .content-area { flex: 1; }
 
-        /* --- Sidebar filters --- */
         .sidebar {
             width: 260px;
             flex-shrink: 0;
@@ -121,14 +162,8 @@
             box-shadow: 0 4px 12px rgba(184,134,11,0.3);
         }
 
-        /* --- Search bar --- */
-        .search-container {
-            margin-bottom: 24px;
-        }
-        .search-wrap {
-            position: relative;
-            max-width: 100%;
-        }
+        .search-container { margin-bottom: 24px; }
+        .search-wrap { position: relative; max-width: 100%; }
         .search-wrap input {
             width: 100%;
             padding: 16px 20px 16px 48px;
@@ -157,7 +192,6 @@
             color: #C9A84C;
         }
 
-        /* --- Stats --- */
         .stats { display: flex; gap: 16px; margin-bottom: 24px; }
         .stat {
             flex: 1;
@@ -175,9 +209,14 @@
             font-weight: 700;
             color: #B8860B;
         }
-        .stat .label { font-size: 0.75em; color: #8B7355; margin-top: 2px; text-transform: uppercase; letter-spacing: 1px; }
+        .stat .label {
+            font-size: 0.75em;
+            color: #8B7355;
+            margin-top: 2px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
 
-        /* --- Cards --- */
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
         .card {
             background: rgba(255,253,247,0.9);
@@ -214,11 +253,8 @@
         .notes { font-size: 0.83em; color: #8B7355; margin-top: 10px; line-height: 1.7; }
         .notes span { color: #5C4B3A; }
         .notes-row { margin-bottom: 2px; }
-
-        /* --- Hidden notes on hover expand --- */
         .notes-detail { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; }
         .card:hover .notes-detail { max-height: 120px; }
-
         .price-rating {
             display: flex;
             justify-content: space-between;
@@ -230,7 +266,6 @@
         .price { font-size: 1.3em; font-weight: 600; color: #3B2F2F; }
         .rating { color: #C9A84C; font-size: 1.05em; font-weight: 500; }
         .longevity { font-size: 0.8em; color: #A89070; }
-
         .empty { text-align: center; color: #B8A88A; padding: 80px 20px; font-size: 1.1em; }
         .powered {
             text-align: center;
@@ -239,6 +274,8 @@
             padding-bottom: 20px;
             font-size: 0.8em;
             letter-spacing: 2px;
+            position: relative;
+            z-index: 1;
         }
 
         @media (max-width: 768px) {
@@ -258,7 +295,6 @@
     <form action="/search" method="get">
     <div class="main-layout">
 
-        <!-- Left: content -->
         <div class="content-area">
 
             <div class="search-container">
@@ -317,7 +353,6 @@
 
         </div>
 
-        <!-- Right: filters sidebar -->
         <div class="sidebar">
             <div class="filter-panel">
                 <h3>Refine</h3>
