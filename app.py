@@ -169,10 +169,10 @@ def ask_ai(request: Request, question: str = ""):
             with langfuse.start_as_current_observation(
                 as_type="generation", name="llm-sql-generation",
             ) as gen_span:
-                gen_span.update(input={"system": SYSTEM_PROMPT, "user": question}, model="openrouter/free")
+                gen_span.update(input={"system": SYSTEM_PROMPT, "user": question}, model="openai/gpt-oss-20b:free")
 
                 response = llm_client.chat.completions.create(
-                    model="openrouter/free",
+                    model="openai/gpt-oss-20b:free",
                     messages=[
                         {"role": "system", "content": SYSTEM_PROMPT},
                         {"role": "user", "content": question}
