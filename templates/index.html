@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Perfume Explorer</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, sans-serif; background: #0f0f0f; color: #e0e0e0; padding: 20px; }
+        h1 { text-align: center; margin-bottom: 20px; font-size: 2em; }
+        .search-bar { display: flex; justify-content: center; margin-bottom: 20px; }
+        .search-bar input[type=text] { width: 400px; padding: 12px 16px; border-radius: 8px; border: 1px solid #333;
+            background: #1a1a1a; color: #fff; font-size: 16px; }
+        .filters { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 24px; }
+        .filters select, .filters input { padding: 8px 12px; border-radius: 6px; border: 1px solid #333;
+            background: #1a1a1a; color: #ccc; font-size: 14px; }
+        .filters button { padding: 8px 20px; border-radius: 6px; border: none;
+            background: #f5c518; color: #000; font-weight: bold; cursor: pointer; }
+        .stats { display: flex; gap: 24px; justify-content: center; margin-bottom: 24px; }
+        .stat { background: #1a1a1a; padding: 16px 24px; border-radius: 8px; text-align: center; }
+        .stat .num { font-size: 1.8em; font-weight: bold; color: #f5c518; }
+        .stat .label { font-size: 0.85em; color: #888; margin-top: 4px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; }
+        .card { background: #1a1a1a; border-radius: 10px; padding: 20px; border: 1px solid #222; }
+        .card h3 { color: #f5c518; margin-bottom: 4px; }
+        .card .brand { color: #888; margin-bottom: 12px; }
+        .card .meta { display: flex; gap: 12px; margin-bottom: 12px; flex-wrap: wrap; }
+        .tag { background: #2a2a2a; padding: 3px 10px; border-radius: 12px; font-size: 0.8em; color: #aaa; }
+        .notes { font-size: 0.85em; color: #777; margin-top: 8px; line-height: 1.5; }
+        .notes span { color: #bbb; }
+        .price-rating { display: flex; justify-content: space-between; margin-top: 12px; }
+        .price { font-size: 1.3em; font-weight: bold; }
+        .rating { color: #f5c518; font-size: 1.1em; }
+        .empty { text-align: center; color: #555; padding: 60px; font-size: 1.2em; }
+        .powered { text-align: center; color: #333; margin-top: 30px; font-size: 0.8em; }
+    </style>
+</head>
+<body>
+    <h1>Perfume Explorer</h1>
+
+    <form action="/search" method="get">
+        <div class="search-bar">
+            <input type="text" name="q" placeholder="Search by name, brand, or notes..."
+                   value="{{ filters.get('q', '') }}">
+        </div>
+        <div class="filters">
+            <select name="brand">
+                <option value="">All Brands</option>
+                {% for b in brands %}
+                <option value="{{ b }}" {{ 'selected' if filters.get('brand') == b }}>{{ b }}</option>
+                {% endfor %}
+            </select>
+            <select name="gender">
+                <option value="">All Genders</option>
+                <option value="men" {{ 'selected' if filters.get('gender') == 'men' }}>Men</option>
+                <option value="women" {{ 'selected' if filters.get('gender') == 'women' }}>Women</option>
+                <option value="unisex" {{ 'selected' if filters.get('gender') == 'unisex' }}>Unisex</option>
+            </select>
+            <select name="season">
+                <option value="">All Seasons</option>
+                {% for s in seasons %}
+                <option value="{{ s }}" {{ 'selected' if filters.get('season') == s }}>{{ s }}</option>
+                {% endfor %}
+            </select>
+            <input type="number" name="min_rating" placeholder="Min rating" step="0.1" min="0" max="5"
+                   value="{{ filters.get('min_rating', 0) }}" style="width:100px;">
+            <button type="submit">Search</button>
+        </div>
+    </form>
+
+    {% if stats %}
+    <div class="stats">
+        <div class="stat"><div class="num">{{ stats.count }}</div><div class="label">Perfumes</div></div>
+        <div class="stat"><div class="num">${{ stats.avg_price|int }}</div><div class="label">Avg Price</div></div>
+        <div class="stat"><div class="num">{{ stats.avg_rating }} ⭐</div><div class="label">Avg Rating</div></div>
+        <div class="stat"><div class="num">{{ stats.avg_longevity|int }}h</div><div class="label">Avg Longevity</div></div>
+    </div>
+    {% endif %}
+
+    {% if perfumes %}
+    <div class="grid">
+        {% for p in perfumes %}
+        <div class="card">
+            <h3>{{ p.name }}</h3>
+            <div class="brand">{{ p.brand }}</div>
+            <div class="meta">
+                <span class="tag">{{ p.category }}</span>
+                <span class="tag">{{ p.gender }}</span>
+                <span class="tag">{{ p.season }}</span>
+                <span class="tag">{{ p.year }}</span>
+                <span class="tag">{{ p.longevity }}h</span>
+            </div>
+            <div class="notes">
+                <div>🔝 Top: <span>{{ p.top }}</span></div>
+                <div>💛 Heart: <span>{{ p.heart }}</span></div>
+                <div>🪵 Base: <span>{{ p.base }}</span></div>
+            </div>
+            <div class="price-rating">
+                <div class="price">${{ p.price|int }}</div>
+                <div class="rating">{{ p.rating }} ⭐</div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% elif filters %}
+    <div class="empty">No perfumes match your filters.</div>
+    {% else %}
+    <div class="empty">Search or filter to explore perfumes.</div>
+    {% endif %}
+
+    <div class="powered">Powered by ClickHouse Cloud ⚡</div>
+</body>
+</html>
