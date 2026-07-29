@@ -1,6 +1,5 @@
 import os
 import time
-import json
 from dotenv import load_dotenv
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
@@ -8,7 +7,7 @@ from fastapi.templating import Jinja2Templates
 import clickhouse_connect
 from typing import Optional
 from langfuse import get_client, propagate_attributes
-from google import genai
+from openai import OpenAI
 
 load_dotenv()
 
@@ -24,7 +23,11 @@ client = clickhouse_connect.get_client(
 )
 
 langfuse = get_client()
-gemini = genai.Client(api_key=os.environ['GOOGLE_API_KEY'])
+
+llm_client = OpenAI(
+    base_url="https://openrouter.ai/api/v1",
+    api_key=os.environ['OPENROUTER_API_KEY']
+)
 
 SYSTEM_PROMPT = """You are a SQL expert. You convert natural language questions into ClickHouse SQL queries.
 
@@ -164,21 +167,26 @@ def ask_ai(request: Request, question: str = ""):
 
             # Step 1: LLM generates SQL
             with langfuse.start_as_current_observation(
-                as_type="generation", name="gemini-sql-generation",
+                as_type="generation", name="llm-sql-generation",
             ) as gen_span:
-                gen_span.update(input={"system": SYSTEM_PROMPT, "user": question}, model="gemini-2.0-flash")
+                gen_span.update(input={"system": SYSTEM_PROMPT, "user": question}, model="meta-llama/llama-3.3-70b-instruct:free")
 
-                response = gemini.models.generate_content(
-                    model="gemini-2.0-flash",
-                    contents=f"{SYSTEM_PROMPT}\n\nUser question: {question}"
+                response = llm_client.chat.completions.create(
+                    model="meta-llama/llama-3.3-70b-instruct:free",
+                    messages=[
+                        {"role": "system", "content": SYSTEM_PROMPT},
+                        {"role": "user", "content": question}
+                    ],
+                    max_tokens=500,
+                    temperature=0
                 )
-                generated_sql = response.text.strip().strip('`').replace('sql\n', '').strip()
+                generated_sql = response.choices[0].message.content.strip().strip('`').replace('sql\n', '').strip()
 
                 gen_span.update(
                     output=generated_sql,
                     usage_details={
-                        "input_tokens": response.usage_metadata.prompt_token_count or 0,
-                        "output_tokens": response.usage_metadata.candidates_token_count or 0,
+                        "input_tokens": response.usage.prompt_tokens or 0,
+                        "output_tokens": response.usage.completion_tokens or 0,
                     }
                 )
 
@@ -193,7 +201,6 @@ def ask_ai(request: Request, question: str = ""):
                     rows = client.query(generated_sql).result_rows
                     duration_ms = round((time.time() - start) * 1000, 2)
 
-                    # Try to map results to perfume dicts
                     for r in rows:
                         if len(r) >= 12:
                             perfumes.append({
